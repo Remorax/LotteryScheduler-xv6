@@ -87,6 +87,12 @@ void            log_write(struct buf*);
 void            begin_op();
 void            end_op();
 
+//mersenneTwister.c
+void			init_genrand(unsigned long);
+unsigned long 	genrand_int32(void);
+double 			genrand_real1(void);
+int 			pickRandomTicket(int);
+
 // mp.c
 extern int      ismp;
 void            mpinit(void);
@@ -119,7 +125,6 @@ void            sleep(void*, struct spinlock*);
 void            userinit(void);
 int             wait(void);
 int             randomTicketAllocator(int);
-int             pickRandomTicket(void);
 int 			countTotalTickets(void);   
 void            wakeup(void*);
 void            yield(void);

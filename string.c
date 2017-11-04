@@ -1,5 +1,6 @@
 #include "types.h"
 #include "x86.h"
+#include "defs.h"
 
 void*
 memset(void *dst, int c, uint n)
@@ -101,5 +102,12 @@ strlen(const char *s)
   for(n = 0; s[n]; n++)
     ;
   return n;
+}
+
+void
+test(void)
+{
+  cprintf("HELLO\n\n");
+  return;
 }
 

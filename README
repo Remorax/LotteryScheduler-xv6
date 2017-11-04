@@ -2,7 +2,7 @@ Lottery Scheduler Implemented
 
 1. In this scheduler, every process is randomly allotted certain number of "tickets".
 2. The minimum number of tickets that a process can receive is 1.
-3. Then, a random number is selected, out of the total number of tickets of runnable processes.
+3. Then, a random number is selected, out of the total number of tickets of runnable processes, using mersenne twister randomization.
 4. Whichever process owns this ticket, is chosen for running by the CPU.
 5. Thus, processes having more tickets are more likely to be chosen, and therefore, get more priority.
 6. Once the process finishes execution, the tickets are given back and redistributed amongst the processes.

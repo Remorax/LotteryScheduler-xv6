@@ -15,7 +15,11 @@ struct {
 static struct proc *initproc;
 
 int selectedTickets, AVAILABLE_TICKETS=TOTAL_TICKETS;
-int nextpid = 1, initflag=0, origflag=0, proc1=0, proc2=0, proc1id, proc2id, proc1chosen, proc2chosen;
+int nextpid = 1, initflag=0, origflag=0;
+
+/* Uncommment the line given below to declare proc1 and proc2 related vars */
+// int proc1=0, proc2=0, proc1id, proc2id, proc1chosen, proc2chosen;
+
 static unsigned long X = 1;
 extern void forkret(void);
 extern void trapret(void);
@@ -106,16 +110,24 @@ found:
   
   if(origflag!=0)
   {
-    if(proc1==0){
-      selectedTickets = 1 + randomTicketAllocator((4*AVAILABLE_TICKETS)/5);
-      proc1 = selectedTickets;
-      proc1id = p->pid;
-    }
-    else{
-      selectedTickets = (proc1-1)/4;
-      proc2id = p->pid;
-      proc2 = selectedTickets;
-    }
+    /* Uncommment the part given below to allot 4x tickets for Process 1 as compared to Process 2 */
+    // if(p->pid!=2)
+    // {
+    //   if(proc1==0){
+    //     selectedTickets = 1 + randomTicketAllocator((4*AVAILABLE_TICKETS)/5);
+    //     proc1 = selectedTickets;
+    //     proc1id = p->pid;
+    //   }
+    //   else{
+    //     selectedTickets = (proc1-1)/4;
+    //     proc2id = p->pid;
+    //     proc2 = selectedTickets;
+    //  } 
+    // }
+    // else
+    //   selectedTickets = 1 + randomTicketAllocator(AVAILABLE_TICKETS);
+
+    selectedTickets = 1 + randomTicketAllocator(AVAILABLE_TICKETS);
     p->tickets = selectedTickets;
     AVAILABLE_TICKETS -= selectedTickets; 
   }
@@ -322,18 +334,23 @@ wait(void)
         // Found one.
         AVAILABLE_TICKETS += p->tickets;
         pid = p->pid;
-        cprintf("Proc %d got %d tickets and Proc %d got %d tickets\n",proc1id,proc1,proc2id,proc2);
-        cprintf("Proc %d and %d chosen: %d and %d times\n",proc1id,proc2id,proc1chosen,proc2chosen);
-        if(pid==proc1id){
-          cprintf("Proc 1 chosen: %d times\n",proc1chosen);
-          proc1chosen=0;
-          proc1=0;
-        }
-        else if (pid==proc2id){
-          cprintf("Proc 2 chosen: %d times\n",proc2chosen);
-          proc2chosen=0;
-          proc2=0;
-        }
+
+        /* Uncomment the part given below to print log about no of times proc1 got selected as compared to proc2 */
+        // cprintf("Proc %d got %d tickets and Proc %d got %d tickets\n",proc1id,proc1,proc2id,proc2);
+        // cprintf("Proc %d and %d chosen: %d and %d times\n",proc1id,proc2id,proc1chosen,proc2chosen);
+        // if(pid==proc1id){
+        //   cprintf("Proc %d chosen: %d times\n",proc1id,proc1chosen);
+        //   proc1chosen=0;
+        //   proc1=0;
+        // }
+        // else if (pid==proc2id){
+        //   cprintf("Proc %d chosen: %d times\n",proc2id, proc2chosen);
+        //   proc2chosen=0;
+        //   proc2=0;
+        // }
+
+        cprintf("Proc %d chosen: %d times\n", p->pid, p->ran);
+
         kfree(p->kstack);
         p->kstack = 0;
         freevm(p->pgdir);
@@ -358,17 +375,6 @@ wait(void)
     // Wait for children to exit.  (See wakeup1 call in proc_exit.)
     sleep(curproc, &ptable.lock);  //DOC: wait-sleep
   }
-}
-
-int randstate = 1;
-
-int pickRandomTicket(void) {
-  randstate = randstate * 1664525 + 1013904223;
-  
-  if (randstate < 0) {
-    return (randstate*-1);
-  }
-  return randstate;
 }
 
 //Total number of tickets in all runnable processes
@@ -407,11 +413,10 @@ scheduler(void)
 
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
-  
     totalTickets = countTotalTickets();
     if (totalTickets > 0) 
     {
-      randomlyPickedTicket = pickRandomTicket();
+      randomlyPickedTicket = pickRandomTicket(totalTickets);
       
       if (randomlyPickedTicket < 0)
         randomlyPickedTicket = randomlyPickedTicket * -1;
@@ -426,17 +431,20 @@ scheduler(void)
         if(p->state != RUNNABLE || randomlyPickedTicket >= 0) {
           continue;
         }
-        if (p->pid == proc1id)
-          proc1chosen++;
-        else if (p->pid == proc2id)
-          proc2chosen++;
+
+        /* Uncomment the line given below to increment process ran counter for graph generation purposes */
+        // if (p->pid == proc1id)
+        //   proc1chosen++;
+        // else if (p->pid == proc2id)
+        //   proc2chosen++;
+        
         // Switch to chosen process.  It is the process's job
         // to release ptable.lock and then reacquire it
         // before jumping back to us.
         c->proc = p;
         switchuvm(p);
         p->state = RUNNING;
-
+        p->ran++;
         swtch(&(c->scheduler), p->context);
         switchkvm();
 
