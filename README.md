@@ -1,4 +1,6 @@
-Lottery Scheduler Implemented
+# README
+
+# Lottery Scheduler Implementation:
 
 1. In this scheduler, every process is randomly allotted certain number of "tickets".
 2. The minimum number of tickets that a process can receive is 1.
@@ -9,7 +11,7 @@ Lottery Scheduler Implemented
 7. The cycle thus goes on.
 
 
-This is the original README:
+# Original README
 
 xv6 is a re-implementation of Dennis Ritchie's and Ken Thompson's Unix
 Version 6 (v6).  xv6 loosely follows the structure and style of v6,
